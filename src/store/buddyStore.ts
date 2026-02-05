@@ -38,7 +38,7 @@ interface BuddyState {
   putBuddyToSleep: () => void;
   addStars: (amount: number) => void;
   addExperience: (amount: number) => void;
-  completeActivity: (activityName: string) => void;
+  completeActivity: () => void;
   unlockItem: (itemType: 'outfit' | 'activity' | 'item', itemName: string) => void;
   updateNeeds: (needs: Partial<BuddyNeeds>) => void;
   tickTime: () => void; // Called every minute to decrease needs
@@ -177,7 +177,7 @@ export const useBuddyStore = create<BuddyState>()(
         set({ experience: state.experience + amount });
       },
       
-      completeActivity: (activityName: string) => {
+      completeActivity: () => {
         const state = get();
         set({
           activitiesCompleted: state.activitiesCompleted + 1,
