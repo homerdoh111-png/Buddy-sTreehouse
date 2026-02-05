@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,7 +7,7 @@ import { useBuddyStore } from '@/store/buddyStore';
 // Geometric Buddy Bear Component
 function BuddyModel({ onClick }: { onClick?: () => void }) {
   const groupRef = useRef<THREE.Group>(null);
-  const headRef = useRef<THREE.Mesh>(null);
+  const headRef = useRef<THREE.Group>(null);
   const mood = useBuddyStore((state) => state.currentMood);
   
   // Breathing animation
