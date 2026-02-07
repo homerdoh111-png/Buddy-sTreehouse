@@ -7,8 +7,7 @@ import {
   Environment,
   ContactShadows,
   Float,
-  SpotLight,
-  useAnimations
+  SpotLight
 } from '@react-three/drei';
 import { EffectComposer, Bloom, DepthOfField, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
@@ -67,8 +66,7 @@ function BuddyGLBModel({ onClick }: { onClick?: () => void }) {
   const mood = useBuddyStore((state) => state.currentMood);
   
   // Load GLB model
-  const { scene, animations } = useGLTF('/buddy-model.glb');
-  const { actions } = useAnimations(animations, groupRef);
+  const { scene } = useGLTF('/buddy-model.glb');
   
   // Enhanced breathing and mood animations
   useFrame((state) => {
@@ -140,202 +138,26 @@ function BuddyGLBModel({ onClick }: { onClick?: () => void }) {
   );
 }
 
-// Fallback Geometric Buddy with Enhanced Materials
-function GeometricBuddy({ onClick }: { onClick?: () => void }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const headRef = useRef<THREE.Group>(null);
-  const mood = useBuddyStore((state) => state.currentMood);
+// Loading placeholder
+function LoadingBuddy() {
+  const meshRef = useRef<THREE.Mesh>(null);
   
   useFrame((state) => {
-    if (groupRef.current) {
-      const time = state.clock.getElapsedTime();
-      // Enhanced breathing
-      groupRef.current.scale.y = 1 + Math.sin(time * 2) * 0.04;
-      groupRef.current.scale.x = 1 + Math.sin(time * 2) * 0.02;
-    }
-    
-    if (headRef.current) {
-      const time = state.clock.getElapsedTime();
-      if (mood === 'happy' || mood === 'excited') {
-        headRef.current.rotation.z = Math.sin(time * 3) * 0.08;
-        headRef.current.position.y = 0.8 + Math.sin(time * 4) * 0.02;
-      } else if (mood === 'tired') {
-        headRef.current.rotation.x = -0.3 + Math.sin(time * 0.5) * 0.05;
-      }
+    if (meshRef.current) {
+      meshRef.current.rotation.y = state.clock.elapsedTime;
     }
   });
   
-  const handleClick = () => {
-    if (onClick) onClick();
-    if (groupRef.current) {
-      groupRef.current.position.y = 1.3;
-      setTimeout(() => {
-        if (groupRef.current) groupRef.current.position.y = 1;
-      }, 300);
-    }
-  };
-  
-  const getBodyColor = () => {
-    switch (mood) {
-      case 'happy':
-      case 'excited':
-        return '#E5A55D';
-      case 'sad':
-        return '#B8824A';
-      case 'tired':
-        return '#C0906B';
-      case 'hungry':
-        return '#D4944E';
-      default:
-        return '#D4944E';
-    }
-  };
-  
   return (
-    <Float speed={2} rotationIntensity={0.3} floatIntensity={0.6}>
-      <group ref={groupRef} position={[0, 1, 0]} onClick={handleClick}>
-        {/* Body with enhanced material */}
-        <mesh castShadow receiveShadow position={[0, 0, 0]}>
-          <sphereGeometry args={[0.5, 32, 32]} />
-          <meshStandardMaterial 
-            color={getBodyColor()} 
-            roughness={0.6}
-            metalness={0.1}
-            envMapIntensity={0.5}
-          />
-        </mesh>
-        
-        {/* Belly */}
-        <mesh castShadow receiveShadow position={[0, -0.1, 0.4]}>
-          <sphereGeometry args={[0.35, 24, 24]} />
-          <meshStandardMaterial 
-            color="#F5E6D3" 
-            roughness={0.7}
-            metalness={0.05}
-          />
-        </mesh>
-        
-        {/* Head with enhanced features */}
-        <group ref={headRef} position={[0, 0.8, 0]}>
-          <mesh castShadow receiveShadow>
-            <sphereGeometry args={[0.45, 32, 32]} />
-            <meshStandardMaterial 
-              color={getBodyColor()} 
-              roughness={0.6}
-              metalness={0.1}
-            />
-          </mesh>
-          
-          {/* Ears with inner detail */}
-          <mesh position={[-0.35, 0.35, 0]} castShadow>
-            <sphereGeometry args={[0.18, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-          <mesh position={[-0.35, 0.35, 0.05]}>
-            <sphereGeometry args={[0.12, 16, 16]} />
-            <meshStandardMaterial color="#F5D6B3" roughness={0.7} />
-          </mesh>
-          
-          <mesh position={[0.35, 0.35, 0]} castShadow>
-            <sphereGeometry args={[0.18, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-          <mesh position={[0.35, 0.35, 0.05]}>
-            <sphereGeometry args={[0.12, 16, 16]} />
-            <meshStandardMaterial color="#F5D6B3" roughness={0.7} />
-          </mesh>
-          
-          {/* Muzzle */}
-          <mesh position={[0, -0.1, 0.4]}>
-            <sphereGeometry args={[0.22, 24, 24]} />
-            <meshStandardMaterial color="#F5E6D3" roughness={0.7} />
-          </mesh>
-          
-          {/* Shiny nose */}
-          <mesh position={[0, 0, 0.5]}>
-            <sphereGeometry args={[0.08, 16, 16]} />
-            <meshStandardMaterial 
-              color="#1A0F0A" 
-              roughness={0.2}
-              metalness={0.6}
-            />
-          </mesh>
-          
-          {/* Eyes with shine */}
-          <mesh position={[-0.18, 0.15, 0.35]}>
-            <sphereGeometry args={[0.09, 16, 16]} />
-            <meshStandardMaterial color="#FFFFFF" roughness={0.2} />
-          </mesh>
-          <mesh position={[-0.18, 0.15, 0.42]}>
-            <sphereGeometry args={[0.05, 16, 16]} />
-            <meshStandardMaterial color="#1A1A1A" roughness={0.8} />
-          </mesh>
-          <mesh position={[-0.16, 0.17, 0.44]}>
-            <sphereGeometry args={[0.02, 8, 8]} />
-            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={0.5} />
-          </mesh>
-          
-          <mesh position={[0.18, 0.15, 0.35]}>
-            <sphereGeometry args={[0.09, 16, 16]} />
-            <meshStandardMaterial color="#FFFFFF" roughness={0.2} />
-          </mesh>
-          <mesh position={[0.18, 0.15, 0.42]}>
-            <sphereGeometry args={[0.05, 16, 16]} />
-            <meshStandardMaterial color="#1A1A1A" roughness={0.8} />
-          </mesh>
-          <mesh position={[0.20, 0.17, 0.44]}>
-            <sphereGeometry args={[0.02, 8, 8]} />
-            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={0.5} />
-          </mesh>
-        </group>
-        
-        {/* Arms */}
-        <group position={[-0.5, 0, 0]}>
-          <mesh position={[0, -0.2, 0]} castShadow>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-          <mesh position={[0, -0.4, 0]} castShadow>
-            <sphereGeometry args={[0.12, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-        </group>
-        
-        <group position={[0.5, 0, 0]}>
-          <mesh position={[0, -0.2, 0]} castShadow>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-          <mesh position={[0, -0.4, 0]} castShadow>
-            <sphereGeometry args={[0.12, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-        </group>
-        
-        {/* Legs */}
-        <group position={[-0.25, -0.5, 0.1]}>
-          <mesh castShadow>
-            <capsuleGeometry args={[0.12, 0.3, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-          <mesh position={[0, -0.25, 0.1]} castShadow>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-        </group>
-        
-        <group position={[0.25, -0.5, 0.1]}>
-          <mesh castShadow>
-            <capsuleGeometry args={[0.12, 0.3, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-          <mesh position={[0, -0.25, 0.1]} castShadow>
-            <sphereGeometry args={[0.15, 16, 16]} />
-            <meshStandardMaterial color={getBodyColor()} roughness={0.6} />
-          </mesh>
-        </group>
-      </group>
-    </Float>
+    <mesh ref={meshRef} position={[0, 1, 0]}>
+      <sphereGeometry args={[0.5, 16, 16]} />
+      <meshStandardMaterial 
+        color="#D4944E" 
+        wireframe 
+        emissive="#FFA500"
+        emissiveIntensity={0.5}
+      />
+    </mesh>
   );
 }
 
@@ -380,29 +202,6 @@ function LightingSetup() {
         args={['#87CEEB', '#DEB887', 0.6]}
       />
     </>
-  );
-}
-
-// Loading Placeholder
-function LoadingBuddy() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y = state.clock.elapsedTime;
-    }
-  });
-  
-  return (
-    <mesh ref={meshRef} position={[0, 1, 0]}>
-      <sphereGeometry args={[0.5, 16, 16]} />
-      <meshStandardMaterial 
-        color="#D4944E" 
-        wireframe 
-        emissive="#FFA500"
-        emissiveIntensity={0.5}
-      />
-    </mesh>
   );
 }
 
