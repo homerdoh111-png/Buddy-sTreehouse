@@ -4,7 +4,6 @@ import {
   OrbitControls, 
   PerspectiveCamera, 
   useGLTF, 
-  Environment,
   useTexture,
   Float
 } from '@react-three/drei';
