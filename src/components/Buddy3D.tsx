@@ -4,7 +4,6 @@ import {
   OrbitControls, 
   PerspectiveCamera, 
   useGLTF, 
-  useTexture,
   Float,
   Environment,
   Lightformer
@@ -495,7 +494,7 @@ export default function Buddy3D({ onInteraction, interactive = true }: Buddy3DPr
           {/* Subtle Chromatic Aberration for dreaminess */}
           <ChromaticAberration
             blendFunction={BlendFunction.NORMAL}
-            offset={[0.0005, 0.0005]}
+            offset={new THREE.Vector2(0.0005, 0.0005)}
           />
           
           {/* Soft Vignette */}
