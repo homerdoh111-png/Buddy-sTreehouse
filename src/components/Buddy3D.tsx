@@ -14,10 +14,8 @@ import {
   DepthOfField, 
   Vignette,
   HueSaturation,
-  BrightnessContrast,
-  ChromaticAberration
+  BrightnessContrast
 } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 import { useBuddyStore } from '@/store/buddyStore';
 
@@ -489,12 +487,6 @@ export default function Buddy3D({ onInteraction, interactive = true }: Buddy3DPr
             focusDistance={0.015}
             focalLength={0.05}
             bokehScale={3}
-          />
-          
-          {/* Subtle Chromatic Aberration for dreaminess */}
-          <ChromaticAberration
-            blendFunction={BlendFunction.NORMAL}
-            offset={new THREE.Vector2(0.0005, 0.0005)}
           />
           
           {/* Soft Vignette */}
