@@ -34,7 +34,7 @@ function ForestBackground() {
   );
 }
 
-// Floating, Transparent, ROUND Activity Icon
+// PURE HTML Activity - ABSOLUTELY NO 3D MESHES OR LIGHTS!
 function ActivityBubble({ 
   position, 
   activity, 
@@ -44,10 +44,10 @@ function ActivityBubble({
   activity: any;
   onClick: () => void;
 }) {
+  // NO mesh, NO sphereGeometry, NO pointLight - ONLY HTML!
   return (
     <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.6}>
       <group position={position}>
-        {/* ROUND HTML button */}
         <Html
           center
           transform
@@ -71,7 +71,7 @@ function ActivityBubble({
             style={{
               width: '200px',
               height: '200px',
-              borderRadius: '50%', // ROUND!
+              borderRadius: '50%',
               border: '6px solid',
               boxShadow: activity.unlocked 
                 ? '0 15px 40px rgba(0,0,0,0.3), 0 0 30px rgba(251, 191, 36, 0.4)' 
@@ -106,7 +106,7 @@ function ActivityBubble({
   );
 }
 
-// Treehouse - 45% BIGGER!
+// Treehouse
 function TreehouseModel() {
   const { scene } = useGLTF('/enchanted_treehouse_3d_model.glb');
   
@@ -133,14 +133,14 @@ function TreehouseModel() {
   return (
     <primitive 
       object={scene} 
-      scale={49}  // Was 34, now 49 (45% bigger!)
+      scale={49}
       position={[0, -7, -18]}
       rotation={[0, 0, 0]}
     />
   );
 }
 
-// Buddy - 20% BIGGER + Moved Away!
+// Buddy - FARTHER AWAY!
 function BuddyModel({ onClick }: { onClick?: () => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const mood = useBuddyStore((state) => state.currentMood);
@@ -194,8 +194,8 @@ function BuddyModel({ onClick }: { onClick?: () => void }) {
   
   return (
     <Float speed={2} rotationIntensity={0.2} floatIntensity={0.6}>
-      <group ref={groupRef} position={[-9, 0, -8]} onClick={handleClick}> {/* Moved away from treehouse */}
-        <primitive object={scene} scale={18} /> {/* Was 15, now 18 (20% bigger!) */}
+      <group ref={groupRef} position={[-12, 0, -6]} onClick={handleClick}> {/* MOVED FARTHER! Was [-9, 0, -8] */}
+        <primitive object={scene} scale={18} />
       </group>
     </Float>
   );
