@@ -5,36 +5,26 @@ import {
   PerspectiveCamera, 
   useGLTF, 
   Float,
-  useTexture,
   Html
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useBuddyStore } from '@/store/buddyStore';
 
-// Background with texture
+// Gradient Background - NO texture loading!
 function ForestBackground() {
-  const texture = useTexture('/forest-background.jpg');
-  
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.anisotropy = 16;
-  texture.generateMipmaps = false;
-  texture.needsUpdate = true;
-  
   return (
     <mesh scale={[-1, 1, 1]}>
-      <sphereGeometry args={[50, 128, 128]} />
+      <sphereGeometry args={[50, 64, 64]} />
       <meshBasicMaterial 
-        map={texture} 
+        color="#8BA888"
         side={THREE.BackSide}
-        toneMapped={false}
       />
     </mesh>
   );
 }
 
-// SUPER VISIBLE Activity Button with GLOW
+// PURE HTML Activity - NO 3D ELEMENTS AT ALL!
 function ActivityBubble({ 
   position, 
   activity, 
@@ -44,36 +34,15 @@ function ActivityBubble({
   activity: any;
   onClick: () => void;
 }) {
-  const glowRef = useRef<THREE.Mesh>(null);
-  
-  useFrame((state) => {
-    if (glowRef.current && activity.unlocked) {
-      const pulse = Math.sin(state.clock.elapsedTime * 2) * 0.3 + 1;
-      glowRef.current.scale.setScalar(pulse);
-    }
-  });
-  
   return (
     <group position={position}>
-      {/* HUGE glowing sphere - VERY visible! */}
-      <mesh ref={glowRef}>
-        <sphereGeometry args={[4, 32, 32]} />
-        <meshStandardMaterial 
-          color={activity.unlocked ? "#ffff00" : "#666666"}
-          transparent
-          opacity={0.4}
-          emissive={activity.unlocked ? "#ffff00" : "#333333"}
-          emissiveIntensity={activity.unlocked ? 1.5 : 0.3}
-        />
-      </mesh>
-      
-      {/* MASSIVE HTML button */}
+      {/* ONLY HTML - NO MESHES, NO SPHERES, NO 3D OBJECTS! */}
       <Html
         center
-        distanceFactor={0.5}
+        distanceFactor={0.4}
         style={{
           pointerEvents: activity.unlocked ? 'auto' : 'none',
-          userSelect: 'none'
+          userSelect: 'none',
         }}
         zIndexRange={[100, 0]}
         occlude={false}
@@ -81,59 +50,70 @@ function ActivityBubble({
         <div
           onClick={activity.unlocked ? onClick : undefined}
           style={{
-            width: '700px',
-            height: '700px',
-            borderRadius: '40px',
+            width: '800px',
+            height: '800px',
+            borderRadius: '50px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '50px',
+            gap: '60px',
             cursor: activity.unlocked ? 'pointer' : 'not-allowed',
-            backgroundColor: activity.unlocked ? 'rgba(255, 255, 255, 0.98)' : 'rgba(120, 120, 120, 0.9)',
-            border: activity.unlocked ? '12px solid #FBBF24' : '12px solid #555555',
+            backgroundColor: activity.unlocked ? 'rgba(255, 255, 255, 0.98)' : 'rgba(100, 100, 100, 0.9)',
+            border: activity.unlocked ? '15px solid #FBBF24' : '15px solid #444444',
             boxShadow: activity.unlocked 
-              ? '0 30px 80px rgba(0,0,0,0.5), 0 0 80px rgba(251, 191, 36, 0.8), inset 0 0 40px rgba(251, 191, 36, 0.2)' 
-              : '0 30px 80px rgba(0,0,0,0.4)',
+              ? '0 40px 100px rgba(0,0,0,0.6), 0 0 120px rgba(251, 191, 36, 1), 0 0 200px rgba(251, 191, 36, 0.5), inset 0 0 80px rgba(251, 191, 36, 0.3)' 
+              : '0 40px 100px rgba(0,0,0,0.5)',
             transition: 'all 0.3s ease',
-            animation: activity.unlocked ? 'pulse 2s ease-in-out infinite' : 'none',
+            animation: activity.unlocked ? 'glow-pulse 2s ease-in-out infinite' : 'none',
           }}
           onMouseEnter={(e) => {
             if (activity.unlocked) {
-              e.currentTarget.style.transform = 'scale(1.08)';
-              e.currentTarget.style.boxShadow = '0 40px 100px rgba(0,0,0,0.6), 0 0 100px rgba(251, 191, 36, 1)';
+              e.currentTarget.style.transform = 'scale(1.1)';
+              e.currentTarget.style.boxShadow = '0 50px 120px rgba(0,0,0,0.7), 0 0 150px rgba(251, 191, 36, 1), 0 0 250px rgba(251, 191, 36, 0.7)';
             }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'scale(1)';
             e.currentTarget.style.boxShadow = activity.unlocked 
-              ? '0 30px 80px rgba(0,0,0,0.5), 0 0 80px rgba(251, 191, 36, 0.8)' 
-              : '0 30px 80px rgba(0,0,0,0.4)';
+              ? '0 40px 100px rgba(0,0,0,0.6), 0 0 120px rgba(251, 191, 36, 1), 0 0 200px rgba(251, 191, 36, 0.5)' 
+              : '0 40px 100px rgba(0,0,0,0.5)';
           }}
         >
+          {/* Icon */}
           <span style={{
-            fontSize: '250px',
-            filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.4))',
-            lineHeight: 1
+            fontSize: '300px',
+            filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.5))',
+            lineHeight: 1,
           }}>
             {activity.icon}
           </span>
+          
+          {/* Label */}
           <span style={{
-            fontSize: '70px',
+            fontSize: '80px',
             fontWeight: 'bold',
             color: '#1f2937',
-            textShadow: '0 4px 8px rgba(0,0,0,0.2)',
-            letterSpacing: '2px'
+            textShadow: '0 5px 10px rgba(0,0,0,0.3)',
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
           }}>
             {activity.name}
           </span>
         </div>
+        
+        {/* Add CSS animation */}
+        <style>{`
+          @keyframes glow-pulse {
+            0%, 100% {
+              filter: drop-shadow(0 0 40px rgba(251, 191, 36, 0.8));
+            }
+            50% {
+              filter: drop-shadow(0 0 80px rgba(251, 191, 36, 1));
+            }
+          }
+        `}</style>
       </Html>
-      
-      {/* BRIGHT point light */}
-      {activity.unlocked && (
-        <pointLight color="#ffff00" intensity={3} distance={10} />
-      )}
     </group>
   );
 }
@@ -342,35 +322,35 @@ export default function Buddy3D({ onInteraction, interactive = true, onActivityC
       id: 'letters', 
       name: 'Letters', 
       icon: '📚', 
-      position: [-16, 5, -16] as [number, number, number],
+      position: [-18, 5, -16] as [number, number, number],
       unlocked: true 
     },
     { 
       id: 'numbers', 
       name: 'Numbers', 
       icon: '🔢', 
-      position: [16, 5, -16] as [number, number, number],
+      position: [18, 5, -16] as [number, number, number],
       unlocked: true 
     },
     { 
       id: 'colors', 
       name: 'Colors', 
       icon: '🎨', 
-      position: [0, 12, -14] as [number, number, number],
+      position: [0, 13, -14] as [number, number, number],
       unlocked: true 
     },
     { 
       id: 'shapes', 
       name: 'Shapes', 
       icon: '⭐', 
-      position: [-12, -1, -15] as [number, number, number],
+      position: [-14, -1, -15] as [number, number, number],
       unlocked: false 
     },
     { 
       id: 'music', 
       name: 'Music', 
       icon: '🎵', 
-      position: [12, -1, -15] as [number, number, number],
+      position: [14, -1, -15] as [number, number, number],
       unlocked: false 
     },
   ];
@@ -450,4 +430,3 @@ export default function Buddy3D({ onInteraction, interactive = true, onActivityC
 
 useGLTF.preload('/buddy-model.glb');
 useGLTF.preload('/enchanted_treehouse_3d_model.glb');
-useTexture.preload('/forest-background.jpg');
