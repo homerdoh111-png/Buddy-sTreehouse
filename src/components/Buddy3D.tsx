@@ -5,26 +5,36 @@ import {
   PerspectiveCamera, 
   useGLTF, 
   Float,
+  useTexture,
   Html
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useBuddyStore } from '@/store/buddyStore';
 
-// Gradient Background - NO texture loading!
+// Background
 function ForestBackground() {
+  const texture = useTexture('/forest-background.jpg');
+  
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = 16;
+  texture.generateMipmaps = false;
+  texture.needsUpdate = true;
+  
   return (
     <mesh scale={[-1, 1, 1]}>
-      <sphereGeometry args={[50, 64, 64]} />
+      <sphereGeometry args={[50, 128, 128]} />
       <meshBasicMaterial 
-        color="#8BA888"
+        map={texture} 
         side={THREE.BackSide}
+        toneMapped={false}
       />
     </mesh>
   );
 }
 
-// PURE HTML Activity - NO 3D ELEMENTS AT ALL!
+// PURE HTML Activity Button - NO 3D spheres at all!
 function ActivityBubble({ 
   position, 
   activity, 
@@ -36,83 +46,54 @@ function ActivityBubble({
 }) {
   return (
     <group position={position}>
-      {/* ONLY HTML - NO MESHES, NO SPHERES, NO 3D OBJECTS! */}
+      {/* ONLY HTML - no meshes! */}
       <Html
         center
-        distanceFactor={0.4}
+        transform
+        distanceFactor={8}
+        position={[0, 0, 0]}
         style={{
           pointerEvents: activity.unlocked ? 'auto' : 'none',
           userSelect: 'none',
         }}
-        zIndexRange={[100, 0]}
-        occlude={false}
       >
         <div
           onClick={activity.unlocked ? onClick : undefined}
+          className={`
+            flex flex-col items-center justify-center gap-6
+            transition-all cursor-pointer
+            ${activity.unlocked 
+              ? 'bg-white/95 hover:bg-white border-yellow-400 hover:border-yellow-500' 
+              : 'bg-gray-400/80 cursor-not-allowed border-gray-500'
+            }
+          `}
           style={{
-            width: '800px',
-            height: '800px',
-            borderRadius: '50px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '60px',
-            cursor: activity.unlocked ? 'pointer' : 'not-allowed',
-            backgroundColor: activity.unlocked ? 'rgba(255, 255, 255, 0.98)' : 'rgba(100, 100, 100, 0.9)',
-            border: activity.unlocked ? '15px solid #FBBF24' : '15px solid #444444',
+            width: '250px',
+            height: '250px',
+            borderRadius: '30px',
+            border: '8px solid',
             boxShadow: activity.unlocked 
-              ? '0 40px 100px rgba(0,0,0,0.6), 0 0 120px rgba(251, 191, 36, 1), 0 0 200px rgba(251, 191, 36, 0.5), inset 0 0 80px rgba(251, 191, 36, 0.3)' 
-              : '0 40px 100px rgba(0,0,0,0.5)',
-            transition: 'all 0.3s ease',
-            animation: activity.unlocked ? 'glow-pulse 2s ease-in-out infinite' : 'none',
+              ? '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(251, 191, 36, 0.6)' 
+              : '0 20px 60px rgba(0,0,0,0.4)',
           }}
           onMouseEnter={(e) => {
             if (activity.unlocked) {
               e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.boxShadow = '0 50px 120px rgba(0,0,0,0.7), 0 0 150px rgba(251, 191, 36, 1), 0 0 250px rgba(251, 191, 36, 0.7)';
             }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = activity.unlocked 
-              ? '0 40px 100px rgba(0,0,0,0.6), 0 0 120px rgba(251, 191, 36, 1), 0 0 200px rgba(251, 191, 36, 0.5)' 
-              : '0 40px 100px rgba(0,0,0,0.5)';
           }}
         >
-          {/* Icon */}
-          <span style={{
-            fontSize: '300px',
-            filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.5))',
-            lineHeight: 1,
-          }}>
-            {activity.icon}
-          </span>
-          
-          {/* Label */}
-          <span style={{
-            fontSize: '80px',
+          <span style={{ fontSize: '100px' }}>{activity.icon}</span>
+          <span style={{ 
+            fontSize: '28px', 
             fontWeight: 'bold',
-            color: '#1f2937',
-            textShadow: '0 5px 10px rgba(0,0,0,0.3)',
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
+            color: '#1f2937'
           }}>
             {activity.name}
           </span>
         </div>
-        
-        {/* Add CSS animation */}
-        <style>{`
-          @keyframes glow-pulse {
-            0%, 100% {
-              filter: drop-shadow(0 0 40px rgba(251, 191, 36, 0.8));
-            }
-            50% {
-              filter: drop-shadow(0 0 80px rgba(251, 191, 36, 1));
-            }
-          }
-        `}</style>
       </Html>
     </group>
   );
@@ -430,3 +411,4 @@ export default function Buddy3D({ onInteraction, interactive = true, onActivityC
 
 useGLTF.preload('/buddy-model.glb');
 useGLTF.preload('/enchanted_treehouse_3d_model.glb');
+useTexture.preload('/forest-background.jpg');
