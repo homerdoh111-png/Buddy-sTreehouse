@@ -34,7 +34,7 @@ function ForestBackground() {
   );
 }
 
-// PURE HTML Activity Button - NO 3D spheres at all!
+// Floating, Transparent, ROUND Activity Icon
 function ActivityBubble({ 
   position, 
   activity, 
@@ -45,61 +45,68 @@ function ActivityBubble({
   onClick: () => void;
 }) {
   return (
-    <group position={position}>
-      {/* ONLY HTML - no meshes! */}
-      <Html
-        center
-        transform
-        distanceFactor={8}
-        position={[0, 0, 0]}
-        style={{
-          pointerEvents: activity.unlocked ? 'auto' : 'none',
-          userSelect: 'none',
-        }}
-      >
-        <div
-          onClick={activity.unlocked ? onClick : undefined}
-          className={`
-            flex flex-col items-center justify-center gap-6
-            transition-all cursor-pointer
-            ${activity.unlocked 
-              ? 'bg-white/95 hover:bg-white border-yellow-400 hover:border-yellow-500' 
-              : 'bg-gray-400/80 cursor-not-allowed border-gray-500'
-            }
-          `}
+    <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.6}>
+      <group position={position}>
+        {/* ROUND HTML button */}
+        <Html
+          center
+          transform
+          distanceFactor={8}
+          position={[0, 0, 0]}
           style={{
-            width: '250px',
-            height: '250px',
-            borderRadius: '30px',
-            border: '8px solid',
-            boxShadow: activity.unlocked 
-              ? '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(251, 191, 36, 0.6)' 
-              : '0 20px 60px rgba(0,0,0,0.4)',
-          }}
-          onMouseEnter={(e) => {
-            if (activity.unlocked) {
-              e.currentTarget.style.transform = 'scale(1.1)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
+            pointerEvents: activity.unlocked ? 'auto' : 'none',
+            userSelect: 'none',
           }}
         >
-          <span style={{ fontSize: '100px' }}>{activity.icon}</span>
-          <span style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold',
-            color: '#1f2937'
-          }}>
-            {activity.name}
-          </span>
-        </div>
-      </Html>
-    </group>
+          <div
+            onClick={activity.unlocked ? onClick : undefined}
+            className={`
+              flex flex-col items-center justify-center gap-3
+              transition-all cursor-pointer
+              ${activity.unlocked 
+                ? 'bg-white/60 hover:bg-white/70 border-yellow-400/60 hover:border-yellow-500/80' 
+                : 'bg-gray-400/50 cursor-not-allowed border-gray-500/40'
+              }
+            `}
+            style={{
+              width: '200px',
+              height: '200px',
+              borderRadius: '50%', // ROUND!
+              border: '6px solid',
+              boxShadow: activity.unlocked 
+                ? '0 15px 40px rgba(0,0,0,0.3), 0 0 30px rgba(251, 191, 36, 0.4)' 
+                : '0 15px 40px rgba(0,0,0,0.25)',
+              backdropFilter: 'blur(8px)',
+            }}
+            onMouseEnter={(e) => {
+              if (activity.unlocked) {
+                e.currentTarget.style.transform = 'scale(1.15)';
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.backgroundColor = activity.unlocked 
+                ? 'rgba(255, 255, 255, 0.6)' 
+                : 'rgba(150, 150, 150, 0.5)';
+            }}
+          >
+            <span style={{ fontSize: '80px' }}>{activity.icon}</span>
+            <span style={{ 
+              fontSize: '20px', 
+              fontWeight: 'bold',
+              color: '#1f2937'
+            }}>
+              {activity.name}
+            </span>
+          </div>
+        </Html>
+      </group>
+    </Float>
   );
 }
 
-// Treehouse
+// Treehouse - 45% BIGGER!
 function TreehouseModel() {
   const { scene } = useGLTF('/enchanted_treehouse_3d_model.glb');
   
@@ -126,14 +133,14 @@ function TreehouseModel() {
   return (
     <primitive 
       object={scene} 
-      scale={34}
-      position={[0, -6, -16]}
+      scale={49}  // Was 34, now 49 (45% bigger!)
+      position={[0, -7, -18]}
       rotation={[0, 0, 0]}
     />
   );
 }
 
-// Buddy
+// Buddy - 20% BIGGER + Moved Away!
 function BuddyModel({ onClick }: { onClick?: () => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const mood = useBuddyStore((state) => state.currentMood);
@@ -187,8 +194,8 @@ function BuddyModel({ onClick }: { onClick?: () => void }) {
   
   return (
     <Float speed={2} rotationIntensity={0.2} floatIntensity={0.6}>
-      <group ref={groupRef} position={[-6, 0, -6]} onClick={handleClick}>
-        <primitive object={scene} scale={15} />
+      <group ref={groupRef} position={[-9, 0, -8]} onClick={handleClick}> {/* Moved away from treehouse */}
+        <primitive object={scene} scale={18} /> {/* Was 15, now 18 (20% bigger!) */}
       </group>
     </Float>
   );
@@ -261,7 +268,7 @@ function SimpleLighting() {
         color="#B0C4DE"
       />
       <ambientLight intensity={0.9} color="#FFE8CC" />
-      <pointLight position={[0, 4, -16]} intensity={3} color="#FFD700" distance={20} />
+      <pointLight position={[0, 4, -18]} intensity={3} color="#FFD700" distance={20} />
     </>
   );
 }
@@ -303,35 +310,35 @@ export default function Buddy3D({ onInteraction, interactive = true, onActivityC
       id: 'letters', 
       name: 'Letters', 
       icon: '📚', 
-      position: [-18, 5, -16] as [number, number, number],
+      position: [-20, 6, -18] as [number, number, number],
       unlocked: true 
     },
     { 
       id: 'numbers', 
       name: 'Numbers', 
       icon: '🔢', 
-      position: [18, 5, -16] as [number, number, number],
+      position: [20, 6, -18] as [number, number, number],
       unlocked: true 
     },
     { 
       id: 'colors', 
       name: 'Colors', 
       icon: '🎨', 
-      position: [0, 13, -14] as [number, number, number],
+      position: [0, 14, -16] as [number, number, number],
       unlocked: true 
     },
     { 
       id: 'shapes', 
       name: 'Shapes', 
       icon: '⭐', 
-      position: [-14, -1, -15] as [number, number, number],
+      position: [-16, -1, -17] as [number, number, number],
       unlocked: false 
     },
     { 
       id: 'music', 
       name: 'Music', 
       icon: '🎵', 
-      position: [14, -1, -15] as [number, number, number],
+      position: [16, -1, -17] as [number, number, number],
       unlocked: false 
     },
   ];
@@ -357,7 +364,7 @@ export default function Buddy3D({ onInteraction, interactive = true, onActivityC
       >
         <PerspectiveCamera 
           makeDefault 
-          position={[0, 4, 18]} 
+          position={[0, 4, 20]} 
           fov={75}
         />
         
@@ -395,11 +402,11 @@ export default function Buddy3D({ onInteraction, interactive = true, onActivityC
           <OrbitControls
             enablePan={false}
             enableZoom={true}
-            minDistance={12}
-            maxDistance={26}
+            minDistance={14}
+            maxDistance={30}
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI / 2}
-            target={[0, 2, -12]}
+            target={[0, 2, -14]}
             maxAzimuthAngle={Math.PI / 3}
             minAzimuthAngle={-Math.PI / 3}
           />
